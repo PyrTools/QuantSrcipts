@@ -2,7 +2,7 @@
 Repository of low user effort quantization scripts for multiple formats.
 
 Depenencies
-ALL ``pip install llmcompressor transformers optimum autoawq auto-gptq torchvision``
+ALL ``pip install llmcompressor transformers optimum autoawq auto-gptq torchvision hqq``
 
 GPTQ ``pip install transformers optimum auto-gptq``
 
