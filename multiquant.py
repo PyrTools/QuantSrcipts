@@ -31,6 +31,29 @@ def quantize_awq(model_path):
 
     print(f'Model is quantized and saved at "{SAVE_DIR}"')
 
+# Function for quantizing using HQQ
+def quantize_hqq(model_path):
+    try:
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer, HqqConfig
+    except ImportError:
+        print("HQQ quantization requires the `hqq` packages. Please install them via pip.")
+        return
+    
+    quant_config = HqqConfig(nbits=4, group_size=128, axis=1)
+    model = AutoModelForCausalLM.from_pretrained(model_path,
+                                             torch_dtype=torch.float16,
+                                             device_map="cuda:0",
+                                             quantization_config=quant_config,
+                                             low_cpu_mem_usage=True)
+    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+
+    SAVE_DIR = model_path.split("/")[-1] + "-HQQ-4bit"
+    model.save_pretrained(SAVE_DIR)
+    tokenizer.save_pretrained(SAVE_DIR)
+
+    print(f'Model is quantized and saved at "{SAVE_DIR}"')
+
 
 # Function for quantizing using GPTQ
 def quantize_gptq(model_path):
@@ -114,6 +137,9 @@ def main():
     
     if 'fp8' in scripts_to_run:
         quantize_fp8(args.model_path)
+
+    if 'hqq' in scripts_to_run:
+        quantize_hqq(args.model_path)
 
 
 if __name__ == "__main__":
